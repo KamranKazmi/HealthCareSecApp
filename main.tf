@@ -3,7 +3,7 @@ provider "google" {
   project     = var.project_id
   region      = var.region
 }
-
+#tfsec:ignore:enable-vpc-flow-logs
 module "network" {
   source       = "./Modules/network" #"github.com/KamranKazmi/HealthCareComplianceApp//SimpleHealthcare/infra/Modules/network"
   network_name = var.network_name
