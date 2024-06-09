@@ -4,7 +4,6 @@ network_name    = "my-vpc-network"  # Custom name for your VPC network
 subnet_name     = "my-subnet"  # Custom name for your subnet
 cidr_block      = "10.0.0.0/16"  # Define the CIDR block for your subnet
 bucket_name     = "my-healthcare-data-bucket"  # Custom name for your Cloud Storage bucket
-bucket-2        = "test-bucket"
 kms_key_name    = "projects/simplehealth360/locations/us-central1/keyRings/keycentral/cryptoKeys/my-key-central"  # Replace with the actual KMS key resource ID
 dataset_name    = "my_healthcare_dataset"  # Custom name for your BigQuery dataset
 roles           = ["roles/owner", "roles/bigquery.admin", "roles/cloudkms.cryptoKeyEncrypterDecrypter", "roles/storage.admin"]  # IAM roles to assign (use roles/owner for full access)

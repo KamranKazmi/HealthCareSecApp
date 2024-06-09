@@ -11,10 +11,17 @@ module "network" {
   cidr_block   = var.cidr_block
 }
 
-module "storage" {
+module "storage-1" {
   source          = "./Modules/storage" #"github.com/KamranKazmi/HealthCareComplianceApp//SimpleHealthcare/infra/Modules/storage"
   bucket_name     = var.bucket_name
-  bucket-2 = var.bucket-2
+  location        = var.region
+  kms_key_name    = var.kms_key_name
+  logging_bucket  = var.logging_bucket
+}
+
+module "storage-2" {
+  source          = "./Modules/storage" #"github.com/KamranKazmi/HealthCareComplianceApp//SimpleHealthcare/infra/Modules/storage"
+  bucket_name     = "buckettwo"
   location        = var.region
   kms_key_name    = var.kms_key_name
   logging_bucket  = var.logging_bucket
