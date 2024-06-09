@@ -1,0 +1,48 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    branches:
+      - main  # Change this to your target branch
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.7  # Change to the version you are using
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      id: plan
+      run: |
+        terraform plan -no-color -detailed-exitcode > plan.out
+        echo "Terraform plan completed with exit code $?"
+        cat plan.out
+      continue-on-error: false
+
+    - name: Check Terraform Plan Exit Code
+      id: check_plan
+      run: |
+        PLAN_EXIT_CODE=$?
+        echo "Plan exit code: $PLAN_EXIT_CODE"
+        echo "::set-output name=plan_exit_code::$PLAN_EXIT_CODE"
+        if [ $PLAN_EXIT_CODE -eq 1 ]; then
+          echo "Terraform plan failed. See the output above for details."
+          exit 1
+        fi
+
+    - name: Check for Changes
+      if: steps.check_plan.outputs.plan_exit_code == '2'
+      run: echo "Terraform plan detected changes."
