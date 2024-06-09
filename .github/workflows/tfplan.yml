@@ -30,7 +30,7 @@ jobs:
         terraform plan -no-color -detailed-exitcode > plan.out
         echo "Terraform plan completed with exit code $?"
         cat plan.out
-      continue-on-error: true
+      continue-on-error: false
 
     - name: Check Terraform Plan Exit Code
       id: check_plan
