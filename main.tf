@@ -14,6 +14,7 @@ module "network" {
 module "storage" {
   source          = "./Modules/storage" #"github.com/KamranKazmi/HealthCareComplianceApp//SimpleHealthcare/infra/Modules/storage"
   bucket_name     = var.bucket_name
+  bucket-2 = var.bucket-2
   location        = var.region
   kms_key_name    = var.kms_key_name
   logging_bucket  = var.logging_bucket

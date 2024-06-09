@@ -39,3 +39,10 @@ resource "google_logging_project_sink" "bucket_sink" {
 
   unique_writer_identity = true
 }
+
+
+resource "google_storage_bucket" "bucket-2" {
+  name                        = var.bucket-2
+  location                    = var.location
+  force_destroy = true  # Add this line to force delete the bucket
+}

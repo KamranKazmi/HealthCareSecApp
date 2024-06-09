@@ -29,6 +29,11 @@ variable "bucket_name" {
   type        = string
 }
 
+variable "bucket-2" {
+  description = "The name of the Cloud Storage bucket."
+  type        = string
+}
+
 variable "kms_key_name" {
   description = "The KMS key for encryption."
   type        = string

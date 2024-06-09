@@ -2,6 +2,10 @@ variable "bucket_name" {
   description = "The name of the Cloud Storage bucket."
   type        = string
 }
+variable "bucket-2" {
+  description = "The name of the Cloud Storage bucket."
+  type        = string
+}
 
 variable "location" {
   description = "The location for the bucket."
