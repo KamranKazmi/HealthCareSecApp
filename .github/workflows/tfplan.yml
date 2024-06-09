@@ -27,15 +27,22 @@ jobs:
     - name: Terraform Plan
       id: plan
       run: |
-        terraform plan -no-color -detailed-exitcode -out=tfplan
+        terraform plan -no-color -detailed-exitcode > plan.out
+        echo "Terraform plan completed with exit code $?"
+        cat plan.out
       continue-on-error: true
 
-    - name: Show Terraform Plan Output
-      if: failure()
+    - name: Check Terraform Plan Exit Code
+      id: check_plan
       run: |
-        echo "Terraform plan failed with exit code $?. See the output above for details."
-        exit 1
+        PLAN_EXIT_CODE=$?
+        echo "Plan exit code: $PLAN_EXIT_CODE"
+        echo "::set-output name=plan_exit_code::$PLAN_EXIT_CODE"
+        if [ $PLAN_EXIT_CODE -eq 1 ]; then
+          echo "Terraform plan failed. See the output above for details."
+          exit 1
+        fi
 
     - name: Check for Changes
-      if: success() && steps.plan.outcome == 'success'
-      run: echo "Terraform plan detected changes or no changes."
+      if: steps.check_plan.outputs.plan_exit_code == '2'
+      run: echo "Terraform plan detected changes."
