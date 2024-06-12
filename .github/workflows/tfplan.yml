@@ -2,8 +2,8 @@ name: Terraform Plan
 
 on:
   pull_request:
-    branches:
-      - main  # Change this to your target branch
+    branches-ignore:
+      - main  # Ignore pull requests to the main branch
 
 jobs:
   terraform:
@@ -18,6 +18,14 @@ jobs:
       with:
         terraform_version: 1.5.7  # Change to the version you are using
 
+    - name: Authenticate to GCP
+      env:
+        GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+      run: |
+        echo "${GCP_CREDENTIALS}" > ${HOME}/gcp-key.json
+        gcloud auth activate-service-account --key-file=${HOME}/gcp-key.json
+        gcloud config set project simplehealth360  # Replace YOUR_PROJECT_ID with your actual project ID
+
     - name: Terraform Init
       run: terraform init
 
@@ -28,21 +36,22 @@ jobs:
       id: plan
       run: |
         terraform plan -no-color -detailed-exitcode > plan.out
-        echo "Terraform plan completed with exit code $?"
+        PLAN_EXIT_CODE=$?
+        echo "Terraform plan completed with exit code $PLAN_EXIT_CODE"
         cat plan.out
+        echo "::set-output name=plan_exit_code::$PLAN_EXIT_CODE"
       continue-on-error: false
 
     - name: Check Terraform Plan Exit Code
       id: check_plan
       run: |
-        PLAN_EXIT_CODE=$?
+        PLAN_EXIT_CODE=$(echo ${{ steps.plan.outputs.plan_exit_code }})
         echo "Plan exit code: $PLAN_EXIT_CODE"
-        echo "::set-output name=plan_exit_code::$PLAN_EXIT_CODE"
         if [ $PLAN_EXIT_CODE -eq 1 ]; then
           echo "Terraform plan failed. See the output above for details."
           exit 1
         fi
 
     - name: Check for Changes
-      if: steps.check_plan.outputs.plan_exit_code == '2'
+      if: steps.plan.outputs.plan_exit_code == '2'
       run: echo "Terraform plan detected changes."
