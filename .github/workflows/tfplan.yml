@@ -22,9 +22,9 @@ jobs:
       env:
         GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
       run: |
-        echo "${GCP_CREDENTIALS}" > ${HOME}/gcp-key.json
-        gcloud auth activate-service-account --key-file=${HOME}/gcp-key.json
-        gcloud config set project simplehealth360 # Replace YOUR_PROJECT_ID with your actual project ID
+        echo "${{ secrets.GCP_CREDENTIALS }}" > gcp-key.json
+        gcloud auth activate-service-account --key-file=gcp-key.json
+        gcloud config set project simplehealth360  # Replace YOUR_PROJECT_ID with your actual project ID
 
     - name: Terraform Init
       run: terraform init
@@ -34,10 +34,25 @@ jobs:
 
     - name: Terraform Plan
       id: plan
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
       run: |
         set -e
-        terraform plan -no-color -detailed-exitcode > plan.out
+        terraform plan -no-color -detailed-exitcode -var="use_github_actions=true" -var="credentials_json=${{ secrets.GCP_CREDENTIALS }}" > plan.out
         PLAN_EXIT_CODE=$?
         echo "Terraform plan completed with exit code $PLAN_EXIT_CODE"
         cat plan.out
+        echo "::set-output name=plan_exit_code::$PLAN_EXIT_CODE"
         exit $PLAN_EXIT_CODE
+
+    - name: Check Terraform Plan Exit Code
+      id: check_plan
+      run: |
+        PLAN_EXIT_CODE=${{ steps.plan.outputs.plan_exit_code }}
+        echo "Plan exit code: $PLAN_EXIT_CODE"
+        if [ "$PLAN_EXIT_CODE" -eq 1 ]; then
+          echo "Terraform plan failed. See the output above for details."
+          exit 1
+        elif [ "$PLAN_EXIT_CODE" -eq 2 ]; then
+          echo "Terraform plan detected changes."
+        fi
