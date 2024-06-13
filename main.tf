@@ -1,5 +1,10 @@
+variable "use_github_actions" {
+  type    = bool
+  default = false
+}
+
 provider "google" {
-  credentials = file(var.credentials_file_path)
+   credentials = var.use_github_actions ? var.credentials_json : file(var.credentials_file_path)
   project     = var.project_id
   region      = var.region
 }
