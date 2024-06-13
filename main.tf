@@ -1,4 +1,4 @@
-#Main.tf documentts
+#Main.tf documenttss
 
 variable "use_github_actions" {
   type    = bool
