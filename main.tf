@@ -1,3 +1,5 @@
+#Main.tf document
+
 variable "use_github_actions" {
   type    = bool
   default = false
