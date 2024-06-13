@@ -18,11 +18,15 @@ jobs:
       with:
         terraform_version: 1.5.7  # Change to the version you are using
 
-    - name: Authenticate to GCP
+    - name: Decode GCP Credentials
       env:
-        GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        GCP_CREDENTIALS_BASE64: ${{ secrets.GCP_CREDENTIALS }}
       run: |
-        echo "${{ secrets.GCP_CREDENTIALS }}" > gcp-key.json
+        echo "${GCP_CREDENTIALS}" | base64 --decode > gcp-key.json
+        cat gcp-key.json  # Optional: To verify the content, remove in production
+
+    - name: Authenticate to GCP
+      run: |
         gcloud auth activate-service-account --key-file=gcp-key.json
         gcloud config set project simplehealth360  # Replace YOUR_PROJECT_ID with your actual project ID
 
@@ -38,7 +42,7 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
       run: |
         set -e
-        terraform plan -no-color -detailed-exitcode -var="use_github_actions=true" -var="credentials_json=${{ secrets.GCP_CREDENTIALS }}" > plan.out
+        terraform plan -no-color -detailed-exitcode -var="use_github_actions=true" -var="credentials_json=$(echo "${{ secrets.GCP_CREDENTIALS }}" | base64 --decode)" > plan.out
         PLAN_EXIT_CODE=$?
         echo "Terraform plan completed with exit code $PLAN_EXIT_CODE"
         cat plan.out
@@ -56,3 +60,6 @@ jobs:
         elif [ "$PLAN_EXIT_CODE" -eq 2 ]; then
           echo "Terraform plan detected changes."
         fi
+
+    - name: Debug Step
+      run: echo "This is a debug step to ensure the workflow runs."
