@@ -20,9 +20,9 @@ jobs:
 
     - name: Decode GCP Credentials
       env:
-        GCP_CREDENTIALS_BASE64: ${{ secrets.GCP_CREDENTIALS }}
+        GCP_CREDENTIALS_BASE64: ${{ secrets.GCP_CREDENTIALS_BASE64 }}
       run: |
-        echo "${GCP_CREDENTIALS}" | base64 --decode > gcp-key.json
+        echo "${GCP_CREDENTIALS_BASE64}" | base64 --decode > gcp-key.json
         cat gcp-key.json  # Optional: To verify the content, remove in production
 
     - name: Authenticate to GCP
@@ -39,10 +39,11 @@ jobs:
     - name: Terraform Plan
       id: plan
       env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS_BASE64 }}
       run: |
         set -e
-        terraform plan -no-color -detailed-exitcode -var="use_github_actions=true" -var="credentials_json=$(echo "${{ secrets.GCP_CREDENTIALS }}" | base64 --decode)" > plan.out
+        echo "${{ secrets.GCP_CREDENTIALS_BASE64 }}" | base64 --decode > gcp-key.json
+        terraform plan -no-color -detailed-exitcode -var="use_github_actions=true" -var="credentials_json=$(cat gcp-key.json)" > plan.out
         PLAN_EXIT_CODE=$?
         echo "Terraform plan completed with exit code $PLAN_EXIT_CODE"
         cat plan.out
