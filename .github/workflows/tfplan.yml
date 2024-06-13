@@ -2,8 +2,8 @@ name: Terraform Plan
 
 on:
   pull_request:
-    branches-ignore:
-      - main  # Ignore pull requests to the main branch
+    branches:
+      - '**'  # This will match all branches
 
 jobs:
   terraform:
