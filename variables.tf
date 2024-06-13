@@ -1,4 +1,4 @@
-#variables
+#variable doc
 
 variable "project_id" {
   description = "The ID of the GCP project."
