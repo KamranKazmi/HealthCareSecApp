@@ -72,3 +72,7 @@ variable "credentials_file_path" {
   description = "The path to the service account key file."
   type        = string
 }
+
+variable "credentials_json" {
+  type = string
+}

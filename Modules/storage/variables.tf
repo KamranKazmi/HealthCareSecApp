@@ -3,6 +3,7 @@ variable "bucket_name" {
   type        = string
 }
 
+
 variable "location" {
   description = "The location for the bucket."
   type        = string

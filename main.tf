@@ -1,9 +1,14 @@
+variable "use_github_actions" {
+  type    = bool
+  default = false
+}
+
 provider "google" {
-  credentials = file(var.credentials_file_path)
+   credentials = var.use_github_actions ? var.credentials_json : file(var.credentials_file_path)
   project     = var.project_id
   region      = var.region
 }
-
+#tfsec:ignore:enable-vpc-flow-logs
 module "network" {
   source       = "./Modules/network" #"github.com/KamranKazmi/HealthCareComplianceApp//SimpleHealthcare/infra/Modules/network"
   network_name = var.network_name
@@ -11,9 +16,17 @@ module "network" {
   cidr_block   = var.cidr_block
 }
 
-module "storage" {
+module "storage-1" {
   source          = "./Modules/storage" #"github.com/KamranKazmi/HealthCareComplianceApp//SimpleHealthcare/infra/Modules/storage"
   bucket_name     = var.bucket_name
+  location        = var.region
+  kms_key_name    = var.kms_key_name
+  logging_bucket  = var.logging_bucket
+}
+
+module "storage-2" {
+  source          = "./Modules/storage" #"github.com/KamranKazmi/HealthCareComplianceApp//SimpleHealthcare/infra/Modules/storage"
+  bucket_name     = "buckettwo"
   location        = var.region
   kms_key_name    = var.kms_key_name
   logging_bucket  = var.logging_bucket

@@ -7,7 +7,7 @@ output "subnet_name" {
 }
 
 output "bucket_name" {
-  value = module.storage.bucket_name
+  value = module.storage-1.bucket_name
 }
 
 output "dataset_name" {

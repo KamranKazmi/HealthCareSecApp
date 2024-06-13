@@ -39,3 +39,5 @@ resource "google_logging_project_sink" "bucket_sink" {
 
   unique_writer_identity = true
 }
+
+
